@@ -1,0 +1,70 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "enabled": true,
+        "description": "Check for forbidden operations before bash execution",
+        "forbidden_patterns": [
+          "^rm\\s+",
+          "rm\\s+-[a-zA-Z]*[rf]",
+          "rm\\s+/",
+          "^mv\\s+.*\\s+/dev/null",
+          "DROP\\s+TABLE",
+          "DROP\\s+DATABASE",
+          "TRUNCATE\\s+TABLE",
+          "DELETE\\s+FROM",
+          "git\\s+push\\s+--force",
+          "git\\s+push\\s+-f",
+          "git\\s+reset\\s+--hard",
+          "git\\s+clean\\s+-[a-zA-Z]*f",
+          "git\\s+branch\\s+-D",
+          "^sed\\s+.*-i",
+          "^dd\\s+",
+          "chmod\\s+777",
+          "chmod\\s+[0-9]*7[0-9]*[0-9]*",
+          "\\|\\s*(bash|sh|eval|exec)",
+          "curl\\s+.*\\|\\s*(bash|sh)",
+          "wget\\s+.*-O\\s*-\\s*\\|\\s*(bash|sh)",
+          "^kill\\s+-9",
+          "^pkill",
+          "^killall",
+          "^sudo\\s+",
+          "^reboot",
+          "^shutdown",
+          "chmod\\s+[0-9]{3}\\s+/",
+          "find\\s+.*-exec.*rm",
+          "find\\s+.*-exec.*dd"
+        ],
+        "action": "block_if_forbidden"
+      },
+      {
+        "matcher": "Edit",
+        "enabled": true,
+        "description": "Warn before editing sensitive files",
+        "sensitive_files": [
+          ".env",
+          "settings.json",
+          ".git",
+          "secrets"
+        ],
+        "action": "warn_if_sensitive"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "enabled": false,
+        "description": "Log bash commands executed (disabled by default)",
+        "action": "log_command"
+      }
+    ],
+    "RouteToCodex": {
+      "enabled": true,
+      "description": "Detect heavy tasks and suggest Codex subprocess"
+    }
+  },
+  "version": "1.0",
+  "created": "2026-06-01",
+  "description": "Hook configuration for task routing and safety checks"
+}

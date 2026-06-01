@@ -1,0 +1,10 @@
+{
+  "codex_subprocess": {
+    "enabled": true,
+    "approval_policy": "on-request",
+    "sandbox_policy": "workspace-write"
+  },
+  "agent_dispatch": {
+    "enabled": true
+  }
+}

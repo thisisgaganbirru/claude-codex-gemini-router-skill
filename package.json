@@ -1,0 +1,44 @@
+{
+  "name": "claude-codex-integration",
+  "version": "1.0.0",
+  "description": "Dispatch heavy tasks from Claude Code to Codex subprocess with safety constraints and approval workflows",
+  "author": "User",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/claude-codex-integration"
+  },
+  "keywords": [
+    "claude",
+    "codex",
+    "subprocess",
+    "task-routing",
+    "complexity-detection",
+    "approval-workflow"
+  ],
+  "scripts": {
+    "install": "pwsh scripts/Install-Codex.ps1",
+    "validate": "pwsh scripts/Validate-Codex.ps1",
+    "uninstall": "pwsh scripts/Install-Codex.ps1 -Uninstall"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "config/",
+    "scripts/",
+    "references/"
+  ],
+  "engines": {
+    "node": ">=14.0.0",
+    "powershell": ">=7.0"
+  },
+  "dependencies": {
+    "codex-cli": "^1.0.0"
+  },
+  "devDependencies": {},
+  "directories": {
+    "config": "config",
+    "scripts": "scripts",
+    "references": "references"
+  }
+}

@@ -1,0 +1,30 @@
+# Backups
+*.backup-*
+
+# System
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Temporary
+tmp/
+temp/
+.tmp/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+.env.local
+
+# Node (if using npm for installation)
+node_modules/
+package-lock.json

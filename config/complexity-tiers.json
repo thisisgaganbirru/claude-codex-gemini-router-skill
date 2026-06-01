@@ -1,0 +1,53 @@
+{
+  "tiers": {
+    "LOW": {
+      "description": "Single file, isolated fix",
+      "file_count": "1-2",
+      "keywords": ["fix", "debug", "patch", "adjust", "modify", "validate", "test", "refine"],
+      "routing": "direct",
+      "examples": [
+        "Fix the login bug",
+        "Add validation to form",
+        "Debug null pointer exception"
+      ]
+    },
+    "MEDIUM": {
+      "description": "Multiple files, coordinated changes",
+      "file_count": "3-5",
+      "keywords": ["implement", "feature", "build", "add", "enhance", "extend", "improve", "update", "upgrade", "connect"],
+      "routing": "subagent",
+      "examples": [
+        "Implement JWT authentication",
+        "Build dashboard component",
+        "Add payment integration"
+      ]
+    },
+    "HIGH": {
+      "description": "Multiple systems, architectural changes",
+      "file_count": "5+",
+      "keywords": ["refactor", "redesign", "rewrite", "overhaul", "restructure", "migrate", "transform", "optimize", "performance", "scale", "bottleneck", "infrastructure", "architecture", "pipeline", "integration"],
+      "routing": "codex",
+      "examples": [
+        "Refactor authentication module for async/await",
+        "Migrate database from SQL to NoSQL",
+        "Redesign API from REST to GraphQL"
+      ]
+    },
+    "CRITICAL": {
+      "description": "Full system redesign, breaking changes",
+      "file_count": "10+",
+      "keywords": ["complete rewrite", "ground up", "from scratch"],
+      "routing": "codex_with_review",
+      "examples": [
+        "Rewrite entire authentication system",
+        "Complete redesign of core architecture"
+      ]
+    }
+  },
+  "detection_rules": {
+    "keyword_match": "Check if task contains keywords from tier",
+    "file_impact": "Estimate files that will change (git diff, file analysis)",
+    "scope_analysis": "Check for multi-system dependencies",
+    "decision": "Use keyword + file impact to determine tier"
+  }
+}
