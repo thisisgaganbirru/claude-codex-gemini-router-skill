@@ -108,18 +108,24 @@ Recommended: Gemini subprocess with approval
 - Results shown with suggestions
 - Rollback point available if needed
 
-### Available Commands
+### How Claude Code Routes Tasks
 
-Once installed, use:
+When you give Claude Code a task:
+
+1. **Claude Code analyzes complexity** — Is this LOW, MEDIUM, HIGH, or CRITICAL?
+2. **Claude Code recommends agent** — For HIGH/CRITICAL:
+   - Code execution tasks (refactor, implement, fix) → suggests **Codex**
+   - Analysis tasks (analyze, design, review) → suggests **Gemini**
+3. **You confirm or override** — Accept the suggestion or choose the other agent
+4. **Claude Code executes** — Routes to selected agent with approval workflow
+
+### Manual Commands (if needed)
 
 ```powershell
-# Smart routing: Claude Code recommends agent (Codex/Gemini)
-.\scripts\Route-ToAgent.ps1 "Your task description"
-
-# Direct routing to Codex (analyzes & prompts)
+# Direct routing to Codex (bypasses Claude Code analysis)
 .\scripts\Route-ToCodex.ps1 "Your code execution task"
 
-# Direct routing to Gemini (analyzes & prompts)
+# Direct routing to Gemini (bypasses Claude Code analysis)
 .\scripts\Route-ToGemini.ps1 "Your analysis/reasoning task"
 
 # Analyze complexity without routing
@@ -209,65 +215,101 @@ git stash list          # View all snapshots
 
 ### Approval Workflow
 
-All HIGH/CRITICAL tasks show agent recommendation:
-```
-[SUGGEST] Recommended agent: Codex
-          Reason: code execution task (refactor/implement/fix)
+**HIGH/CRITICAL tasks require your approval:**
 
-Proceed with Codex? (y = Codex / g = Gemini / n = Cancel)
-```
+Claude Code analyzes the task and recommends an agent based on the work type:
 
-Or for analysis tasks:
 ```
-[SUGGEST] Recommended agent: Gemini
-          Reason: analysis/reasoning task (analyze/design/review)
-
-Proceed with Gemini? (y = Gemini / c = Codex / n = Cancel)
+[SUGGEST] This is a code task → I recommend Codex
+[SUGGEST] This is analysis work → I recommend Gemini
 ```
 
-You can accept the recommendation or choose the alternative agent.
+**You have 3 options:**
+1. **Accept** (y) — Route to recommended agent
+2. **Override** (use other agent) — Route to the alternative
+3. **Decline** (n) — Cancel routing, handle it yourself
+
+**Before execution:**
+- Safety check — blocks dangerous operations
+- Git snapshot — creates rollback point
+- Approval — you confirm before running
 
 ## Example Usage
 
-### Simple Task (Direct)
+### Simple Task (Claude Code Direct)
 
-```powershell
-.\scripts\Route-ToAgent.ps1 "Fix the login form validation"
+**You:** "Fix the login form validation"
 
+Claude Code analyzes and responds:
+```
 [INFO] Complexity: LOW (85% confidence)
-[OK] Task routes to: Claude Code (direct execution)
+[OK] Claude Code handles this directly.
 ```
 
-### Complex Code Task (Codex Recommended)
+---
 
-```powershell
-.\scripts\Route-ToAgent.ps1 "Refactor auth module for async/await"
+### Complex Code Task (Claude Code → Codex)
 
-[INFO] Complexity: HIGH (95% confidence)
-[SUGGEST] Recommended agent: Codex
-          Reason: code execution task (refactor/implement/fix)
+**You:** "Refactor auth module for async/await"
 
-Proceed with Codex? (y = Codex / g = Gemini / n = Cancel)
-y
+Claude Code analyzes and responds:
+```
+[SUGGEST] This is a code execution task (refactor, async/await).
+          I recommend routing to Codex for implementation.
+          
+Route to Codex? (y/n)
+```
+
+**You:** "y"
+
+```
 [OK] Snapshot created: codex-snapshot-20260601-153045
 [ACTION] Executing: codex -p "Refactor auth module..."
 [OK] Codex execution completed
 ```
 
-### Complex Analysis Task (Gemini Recommended)
+---
 
-```powershell
-.\scripts\Route-ToAgent.ps1 "Analyze API design patterns and document findings"
+### Complex Analysis Task (Claude Code → Gemini)
 
-[INFO] Complexity: HIGH (95% confidence)
-[SUGGEST] Recommended agent: Gemini
-          Reason: analysis/reasoning task (analyze/design/review)
+**You:** "Analyze API design patterns and document findings"
 
-Proceed with Gemini? (y = Gemini / c = Codex / n = Cancel)
-y
+Claude Code analyzes and responds:
+```
+[SUGGEST] This is an analysis/reasoning task (analyze, document).
+          I recommend routing to Gemini for detailed reasoning.
+          
+Route to Gemini? (y/n)
+```
+
+**You:** "y"
+
+```
 [OK] Snapshot created: gemini-snapshot-20260601-154532
 [ACTION] Executing: gemini -p "Analyze API design patterns..."
 [OK] Gemini execution completed
+```
+
+---
+
+### Override Claude Code's Recommendation
+
+**You:** "Analyze the code and suggest refactoring opportunities"
+
+Claude Code:
+```
+[SUGGEST] This looks like an analysis task.
+          I recommend Gemini for deep analysis.
+          
+Route to Gemini? (y/n/codex)
+```
+
+**You:** "codex" (override to use Codex instead)
+
+```
+[OK] Using Codex as requested.
+[OK] Snapshot created: codex-snapshot-20260601-155612
+[ACTION] Executing: codex...
 ```
 
 ## Configuration
