@@ -28,3 +28,6 @@ temp/
 # Node (if using npm for installation)
 node_modules/
 package-lock.json
+
+# Session memory (local development only)
+mem/
