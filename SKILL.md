@@ -1,19 +1,19 @@
 ---
 name: claude-codex-integration
-title: Claude Codex Integration
-description: Route heavy tasks from Claude Code to Codex subprocess with automatic complexity detection, safety constraints, and approval workflows
-version: 1.0.0
+title: Claude Codex & Gemini Integration
+description: Route heavy tasks from Claude Code to Codex (code execution) or Gemini (analysis/reasoning) with automatic complexity detection, agent selection, safety constraints, and approval workflows
+version: 2.0.0
 author: Claude Code
 license: MIT
 installable: true
 autoInstall: true
 ---
 
-# Claude Codex Integration Skill
+# Claude Codex & Gemini Integration Skill
 
 ## Overview
 
-Intelligently routes complex tasks from Claude Code to Codex subprocess based on tier detection. Includes safety gating, git snapshots for rollback, and metrics tracking.
+Intelligently routes complex tasks from Claude Code to either **Codex** (for code execution) or **Gemini** (for analysis/reasoning) based on tier detection and task type. Includes automatic agent recommendation, safety gating, git snapshots for rollback, and metrics tracking.
 
 ## Installation
 
@@ -27,60 +27,100 @@ The skill will:
 1. Copy hook scripts to `~/.claude/hooks/`
 2. Wire hooks into `~/.claude/settings.json`
 3. Configure complexity tiers
-4. Validate Codex CLI
+4. Validate CLI tools
 5. Enable routing immediately
 
-### Manual
+### Manual Installation
 
+**For Codex integration:**
 ```powershell
 cd /path/to/claude-codex-integration
 .\scripts\Install-Codex.ps1
+```
+
+**For Gemini integration:**
+```powershell
+cd /path/to/claude-codex-integration
+.\scripts\Install-Gemini.ps1
+```
+
+**For both (recommended):**
+```powershell
+.\scripts\Install-Codex.ps1
+.\scripts\Install-Gemini.ps1
 ```
 
 ## How It Works
 
 ### Tier-Based Routing
 
-Tasks are automatically classified:
+Tasks are automatically classified and routed:
 
-| Tier | Files | Route | Example |
-|------|-------|-------|---------|
-| **LOW** | 1-2 | Claude Code direct | "Fix login bug" |
-| **MEDIUM** | 3-5 | Claude Code + agents | "Implement auth" |
-| **HIGH** | 5+ | Codex subprocess | "Refactor auth module" |
-| **CRITICAL** | 10+ | Codex + review | "Complete rewrite" |
+| Tier | Files | Route | Route Decision |
+|------|-------|-------|---|
+| **LOW** | 1-2 | Claude Code direct | Direct execution |
+| **MEDIUM** | 3-5 | Claude Code + agents | Subagents available |
+| **HIGH** | 5+ | Codex OR Gemini | Claude Code recommends best agent |
+| **CRITICAL** | 10+ | Codex OR Gemini | Claude Code recommends best agent |
 
-### Detection
+**Agent Selection (HIGH/CRITICAL):**
+- **Codex** recommended for: refactor, rewrite, implement, fix, build, debug (code execution)
+- **Gemini** recommended for: analyze, review, document, explain, design, architect, plan (reasoning/analysis)
 
-Analyzes task keywords + file impact:
+### Detection & Agent Selection
+
+Analyzes task keywords + file impact + task type:
+
+**Code Execution Task:**
 ```
 "Refactor authentication module"
   ↓
 Keywords: "refactor" (HIGH tier)
-Files: 7+ estimated (auth, login, session, etc.)
+Files: 7+ estimated
+Task type: code execution
   ↓
-Route: Codex subprocess with approval
+Recommended: Codex subprocess with approval
+```
+
+**Analysis/Reasoning Task:**
+```
+"Analyze API design patterns and document findings"
+  ↓
+Keywords: "analyze", "document" (HIGH tier)
+Files: 5+ estimated
+Task type: analysis/reasoning
+  ↓
+Recommended: Gemini subprocess with approval
 ```
 
 ### Safety & Approval
 
-**Before Codex executes:**
-1. ✅ Safety check — blocks dangerous operations
-2. ✅ Git snapshot — creates rollback point
-3. ✅ User approval — you confirm before execution
-4. ✅ Sandbox constraints — Codex limited to workspace
+**Before Codex/Gemini executes:**
+1. ✅ Complexity analysis — automatic task classification
+2. ✅ Agent recommendation — Claude Code suggests Codex or Gemini
+3. ✅ Safety check — blocks dangerous operations
+4. ✅ Git snapshot — creates rollback point (Codex only)
+5. ✅ User approval — you confirm recommended agent or choose alternative
+6. ✅ Sandbox constraints — execution limited to workspace
 
 **After execution:**
 - Metrics logged to `./mem/`
 - Results shown with suggestions
+- Rollback point available if needed
 
 ### Available Commands
 
 Once installed, use:
 
 ```powershell
-# Route a task to Codex (analyzes & prompts)
-.\scripts\Route-ToCodex.ps1 "Your task description"
+# Smart routing: Claude Code recommends agent (Codex/Gemini)
+.\scripts\Route-ToAgent.ps1 "Your task description"
+
+# Direct routing to Codex (analyzes & prompts)
+.\scripts\Route-ToCodex.ps1 "Your code execution task"
+
+# Direct routing to Gemini (analyzes & prompts)
+.\scripts\Route-ToGemini.ps1 "Your analysis/reasoning task"
 
 # Analyze complexity without routing
 .\scripts\Analyze-TaskComplexity.ps1 "Your task"
@@ -93,39 +133,54 @@ Once installed, use:
 
 # Validate installation
 .\scripts\Validate-Codex.ps1
+.\scripts\Validate-Gemini.ps1
 
 # Uninstall
 .\scripts\Install-Codex.ps1 -Uninstall
+.\scripts\Install-Gemini.ps1 -Uninstall
 ```
 
 ## Requirements
 
 - **Claude Code** (latest)
-- **Codex CLI** (installed in WSL Ubuntu or native)
+- **Codex CLI** (optional, for code execution - WSL Ubuntu or native)
+- **Gemini CLI** (optional, for analysis/reasoning - WSL Ubuntu or native)
 - **Git** (for snapshots)
 - **PowerShell 7+**
 
+At least one CLI (Codex or Gemini) is required for task execution.
+
 ## What Gets Installed
 
+**Global hooks (`~/.claude/`):**
 ```
 ~/.claude/
 ├─ hooks/
-│  ├─ pre-tool-safety.ps1      (blocks dangerous ops)
-│  └─ pre-codex-snapshot.ps1   (git backup)
-└─ settings.json               (updated with hooks config)
+│  ├─ pre-tool-safety.ps1         (blocks dangerous ops)
+│  ├─ pre-codex-snapshot.ps1      (git backup before Codex)
+│  └─ pre-gemini-snapshot.ps1     (git backup before Gemini)
+└─ settings.json                  (updated with hooks config)
 ```
 
-Plus project files:
+**Project scripts:**
 ```
 scripts/
-├─ Route-ToCodex.ps1           (main router)
-├─ Analyze-TaskComplexity.ps1  (tier detection)
-├─ Restore-Snapshot.ps1        (rollback)
-└─ View-Metrics.ps1            (tracking)
+├─ Route-ToAgent.ps1             (smart routing: recommends agent)
+├─ Route-ToCodex.ps1             (direct Codex router)
+├─ Route-ToGemini.ps1            (direct Gemini router)
+├─ Analyze-TaskComplexity.ps1    (tier detection)
+├─ Install-Codex.ps1             (Codex installer)
+├─ Install-Gemini.ps1            (Gemini installer)
+├─ Validate-Codex.ps1            (Codex validator)
+├─ Validate-Gemini.ps1           (Gemini validator)
+├─ Restore-Snapshot.ps1          (rollback)
+└─ View-Metrics.ps1              (tracking)
 
 config/
-├─ hooks.json                  (safety patterns)
-└─ complexity-tiers.json       (tier definitions)
+├─ hooks.json                    (safety patterns)
+├─ complexity-tiers.json         (tier definitions)
+├─ gemini-settings.json.template (Gemini config)
+└─ settings.json.template        (Codex config)
 ```
 
 ## Safety Features
@@ -140,48 +195,79 @@ Blocks dangerous operations:
 
 ### Rollback Safety
 
-Creates git snapshot before Codex runs:
+Creates git snapshot before execution:
 ```
 codex-snapshot-20260601-153045: Refactor auth module
+gemini-snapshot-20260601-154532: Analyze API design
 ```
 
-Restore anytime:
+Different prefixes let you identify which agent ran. Restore anytime:
 ```powershell
-.\Restore-Snapshot.ps1
+git stash list          # View all snapshots
+.\Restore-Snapshot.ps1  # Interactive restore
 ```
 
 ### Approval Workflow
 
-All HIGH/CRITICAL tasks require your approval:
+All HIGH/CRITICAL tasks show agent recommendation:
 ```
-[SUGGEST] This task is HIGH complexity
-Route to Codex? (y/n)
+[SUGGEST] Recommended agent: Codex
+          Reason: code execution task (refactor/implement/fix)
+
+Proceed with Codex? (y = Codex / g = Gemini / n = Cancel)
 ```
+
+Or for analysis tasks:
+```
+[SUGGEST] Recommended agent: Gemini
+          Reason: analysis/reasoning task (analyze/design/review)
+
+Proceed with Gemini? (y = Gemini / c = Codex / n = Cancel)
+```
+
+You can accept the recommendation or choose the alternative agent.
 
 ## Example Usage
 
 ### Simple Task (Direct)
 
 ```powershell
-.\scripts\Route-ToCodex.ps1 "Fix the login form validation"
+.\scripts\Route-ToAgent.ps1 "Fix the login form validation"
 
 [INFO] Complexity: LOW (85% confidence)
-[OK] Task routes to: Claude Code
-     Tier: LOW - Claude Code can handle this
+[OK] Task routes to: Claude Code (direct execution)
 ```
 
-### Complex Task (Codex)
+### Complex Code Task (Codex Recommended)
 
 ```powershell
-.\scripts\Route-ToCodex.ps1 "Refactor auth module for async/await"
+.\scripts\Route-ToAgent.ps1 "Refactor auth module for async/await"
 
 [INFO] Complexity: HIGH (95% confidence)
-[SUGGEST] This task appears to be HIGH complexity
-Route to Codex? (y/n)
+[SUGGEST] Recommended agent: Codex
+          Reason: code execution task (refactor/implement/fix)
+
+Proceed with Codex? (y = Codex / g = Gemini / n = Cancel)
 y
 [OK] Snapshot created: codex-snapshot-20260601-153045
-[ACTION] Executing: codex <task> ...
+[ACTION] Executing: codex -p "Refactor auth module..."
 [OK] Codex execution completed
+```
+
+### Complex Analysis Task (Gemini Recommended)
+
+```powershell
+.\scripts\Route-ToAgent.ps1 "Analyze API design patterns and document findings"
+
+[INFO] Complexity: HIGH (95% confidence)
+[SUGGEST] Recommended agent: Gemini
+          Reason: analysis/reasoning task (analyze/design/review)
+
+Proceed with Gemini? (y = Gemini / c = Codex / n = Cancel)
+y
+[OK] Snapshot created: gemini-snapshot-20260601-154532
+[ACTION] Executing: gemini -p "Analyze API design patterns..."
+[OK] Gemini execution completed
 ```
 
 ## Configuration
@@ -215,8 +301,17 @@ codex --version
 
 # If not installed:
 pip install codex-cli
-# OR
+# OR install in WSL Ubuntu
 wsl -d Ubuntu -- sudo apt install codex
+```
+
+### Gemini not found
+
+```powershell
+gemini --version
+
+# If not installed, refer to Google Gemini CLI documentation
+# Visit: https://github.com/google-ai-sdk/generative-ai-python
 ```
 
 ### Hooks not running
@@ -224,6 +319,7 @@ wsl -d Ubuntu -- sudo apt install codex
 Verify installation:
 ```powershell
 .\scripts\Validate-Codex.ps1
+.\scripts\Validate-Gemini.ps1
 ```
 
 Check `~/.claude/settings.json` has hooks configured.
@@ -261,7 +357,8 @@ Restores backed-up configs.
 
 - **Issues:** Report at project repository
 - **Docs:** See SKILL.md (this file)
-- **Status:** Run `Validate-Codex.ps1` to verify setup
+- **Status:** Run `Validate-Codex.ps1` and `Validate-Gemini.ps1` to verify setup
+- **Smart Routing:** Use `Route-ToAgent.ps1` for automatic agent selection
 
 ## License
 
@@ -270,5 +367,12 @@ MIT
 ---
 
 **Status: Ready to install** ✅
+
+**Features:**
+- ✅ Smart agent routing (Codex for code, Gemini for analysis)
+- ✅ Automatic complexity detection
+- ✅ Safety gates and approval workflows
+- ✅ Git snapshots for rollback
+- ✅ Metrics and execution tracking
 
 Install via: `/install claude-codex-integration`

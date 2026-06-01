@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"& '.\\\\scripts\\\\Analyze-TaskComplexity.ps1' 'implement claude code gemini integration similar to codex, analyze what all needed and how settings needed'\")"
+    ]
+  }
+}

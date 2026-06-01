@@ -1,0 +1,6 @@
+{
+  "gemini_subprocess": {
+    "enabled": true,
+    "approval_policy": "on-request"
+  }
+}

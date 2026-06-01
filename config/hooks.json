@@ -62,6 +62,10 @@
     "RouteToCodex": {
       "enabled": true,
       "description": "Detect heavy tasks and suggest Codex subprocess"
+    },
+    "RouteToGemini": {
+      "enabled": true,
+      "description": "Detect analysis tasks and suggest Gemini subprocess"
     }
   },
   "version": "1.0",
