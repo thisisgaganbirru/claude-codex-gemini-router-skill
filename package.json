@@ -1,39 +1,48 @@
 {
-  "name": "claude-codex-integration",
-  "version": "1.0.0",
-  "description": "Dispatch heavy tasks from Claude Code to Codex subprocess with safety constraints and approval workflows",
-  "author": "User",
+  "name": "claude-codex-gemini-router-skill",
+  "version": "2.0.0",
+  "description": "Smart routing from Claude Code to Codex and Gemini for lower token usage, safer execution, and better task specialization",
+  "author": "Gagan Birru",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/claude-codex-integration"
+    "url": "https://github.com/thisisgaganbirru/claude-codex-gemini-router-skill.git"
   },
   "keywords": [
     "claude",
+    "claude-code",
     "codex",
-    "subprocess",
+    "gemini",
     "task-routing",
+    "agent-routing",
     "complexity-detection",
-    "approval-workflow"
+    "approval-workflow",
+    "safety-gates",
+    "git-snapshots"
   ],
   "scripts": {
-    "install": "pwsh scripts/Install-Codex.ps1",
-    "validate": "pwsh scripts/Validate-Codex.ps1",
-    "uninstall": "pwsh scripts/Install-Codex.ps1 -Uninstall"
+    "install:codex": "pwsh scripts/Install-Codex.ps1",
+    "install:gemini": "pwsh scripts/Install-Gemini.ps1",
+    "validate:codex": "pwsh scripts/Validate-Codex.ps1",
+    "validate:gemini": "pwsh scripts/Validate-Gemini.ps1",
+    "uninstall:codex": "pwsh scripts/Install-Codex.ps1 -Uninstall",
+    "uninstall:gemini": "pwsh scripts/Install-Gemini.ps1 -Uninstall"
   },
   "files": [
     "SKILL.md",
     "README.md",
+    "LICENSE",
     "config/",
     "scripts/",
+    "hooks/",
     "references/"
   ],
   "engines": {
-    "node": ">=14.0.0",
     "powershell": ">=7.0"
   },
   "dependencies": {
-    "codex-cli": "^1.0.0"
+    "codex-cli": "^1.0.0",
+    "gemini-cli": "^2.0.0"
   },
   "devDependencies": {},
   "directories": {
