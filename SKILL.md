@@ -1,7 +1,7 @@
 ---
-name: claude-codex-integration
-title: Claude Codex & Gemini Integration
-description: Route heavy tasks from Claude Code to Codex (code execution) or Gemini (analysis/reasoning) with automatic complexity detection, agent selection, safety constraints, and approval workflows
+name: claude-codex-gemini-router
+title: Claude Task Router
+description: Smart routing from Claude Code to Codex and Gemini for lower token usage, safer execution, and better task specialization
 version: 2.0.0
 author: Claude Code
 license: MIT
@@ -9,11 +9,17 @@ installable: true
 autoInstall: true
 ---
 
-# Claude Codex & Gemini Integration Skill
+# Claude Task Router
 
 ## Overview
 
-Intelligently routes complex tasks from Claude Code to either **Codex** (for code execution) or **Gemini** (for analysis/reasoning) based on tier detection and task type. Includes automatic agent recommendation, safety gating, git snapshots for rollback, and metrics tracking.
+Intelligently routes complex tasks from Claude Code to **Codex** (code execution) or **Gemini** (analysis/reasoning) based on task analysis. Claude Code analyzes each task and recommends the best agent, then executes with safety gates, git snapshots for rollback, and complete metrics tracking.
+
+**Benefits:**
+- 🎯 **Lower token usage** — Route to specialized agents instead of doing everything in Claude Code
+- 🔒 **Safer execution** — Pre-execution safety checks block dangerous operations  
+- 🧠 **Better specialization** — Each agent does what it's best at (Codex for code, Gemini for analysis)
+- ↩️ **Easy rollback** — Git snapshots before execution, restore anytime
 
 ## Installation
 
@@ -413,8 +419,10 @@ MIT
 **Features:**
 - ✅ Smart agent routing (Codex for code, Gemini for analysis)
 - ✅ Automatic complexity detection
+- ✅ Claude Code makes intelligent recommendations
 - ✅ Safety gates and approval workflows
 - ✅ Git snapshots for rollback
 - ✅ Metrics and execution tracking
+- ✅ Lower token usage, safer execution, better specialization
 
-Install via: `/install claude-codex-integration`
+Install via: `/install claude-codex-gemini-router`
